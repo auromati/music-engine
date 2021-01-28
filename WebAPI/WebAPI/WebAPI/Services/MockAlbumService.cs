@@ -52,7 +52,12 @@ namespace WebAPI.Services
             };
         }
 
-        public IEnumerable<Album> GetAlbums(int page = 1)
+        public IEnumerable<Album> GetAllAlbums(int page = 1)
+        {
+            return _albumsRepository.Skip(PAGE_SIZE * (page - 1)).Take(PAGE_SIZE);
+        }
+
+        public IEnumerable<Album> GetAlbumsBySearchQuery(string searchQuery, int page=1)
         {
             return _albumsRepository.Skip(PAGE_SIZE * (page - 1)).Take(PAGE_SIZE);
         }

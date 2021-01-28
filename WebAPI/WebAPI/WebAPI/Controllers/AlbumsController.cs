@@ -22,9 +22,9 @@ namespace WebAPI.Controllers
 
         // GET: api/Albums/5
         [HttpGet("{page}", Name = "Get")]
-        public IEnumerable<Album> Get(int page)
+        public IEnumerable<Album> Get(string searchQuery, int page)
         {
-            return _albumService.GetAlbums(page);
+            return _albumService.GetAlbumsBySearchQuery(searchQuery, page);
         }
     }
 }

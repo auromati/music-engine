@@ -21,10 +21,17 @@ namespace WebAPI.Controllers
         }
 
         // GET: api/Albums/5
-        [HttpGet("{page}", Name = "Get")]
-        public IEnumerable<Album> Get(string searchQuery, int page)
+        [HttpGet("{page}")]
+        public IEnumerable<Album> Get(int page)
         {
-            return _albumService.GetAlbumsBySearchQuery(searchQuery, page);
+            return _albumService.GetAllAlbums(page);
+        }
+
+        // GET: api/Albums/5
+        [HttpGet("bytags/{tagsQuery}/{page}")]
+        public IEnumerable<Album> GetByTagsQuery(string tagsQuery, int page)
+        {
+            return _albumService.GetAlbumsByTagsQuery(tagsQuery, page);
         }
     }
 }

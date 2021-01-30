@@ -61,5 +61,11 @@ namespace WebAPI.Services
         {
             return _albumsRepository.Skip(PAGE_SIZE * (page - 1)).Take(PAGE_SIZE);
         }
+
+        public IEnumerable<Album> GetAlbumsByTagsQuery(string tagsQuery, int page = 1)
+        {
+            var tags = tagsQuery.Split();
+            return _albumsRepository.Where(album => album.Tags.Any(t => tags.Contains(t))).Skip(PAGE_SIZE * (page - 1)).Take(PAGE_SIZE);
+        }
     }
 }

@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VDS.RDF;
+using VDS.RDF.Parsing;
 using VDS.RDF.Query;
+using WebAPI.Models;
 
 namespace WebAPI.Services
 {
@@ -12,6 +15,8 @@ namespace WebAPI.Services
 
         private const string JAMENDO_URL = "http://dbtune.org/jamendo/sparql/";
         private const string GRAPH_NAME = "http://dbtune.org/jamendo/";
+
+        private const string TAG_PREFIX = "<http://dbtune.org/jamendo/tag/";
 
         private readonly string PREFIXES = @"PREFIX geo: <http://www.geonames.org/ontology#>
                                              PREFIX wgs: <http://www.w3.org/2003/01/geo/wgs84_pos#>
@@ -26,8 +31,35 @@ namespace WebAPI.Services
             this._endpoint = new SparqlRemoteEndpoint(new Uri(JAMENDO_URL), GRAPH_NAME);
         }
 
-        public SparqlResultSet GetAlbumsByTag(IList<string> tags)
+        public IEnumerable<Album> GetAlbumsByTags(IEnumerable<string> tags, int page = 1, int pageSize = 10)
         {
+            List<Album> results = new List<Album>();
+
+            var resultsSet = this.QueryAlbumsByTags(tags, page, pageSize);
+            foreach(var albumResult in resultsSet)
+            {
+                results.Add(new Album
+                {
+                    Url = albumResult["alb"].ToString()
+                });
+            }
+
+            return results;
+        }
+        public SparqlResultSet GetAlbumByUrl(string albumUrl)
+        {
+            var query = $"DESCRIBE <{albumUrl}>";
+
+            //Get the result
+            var g = _endpoint.QueryWithResultSet(query);
+
+            return g;
+        }
+
+        private SparqlResultSet QueryAlbumsByTags(IEnumerable<string> tags, int page=1, int pageSize=10)
+        {
+            tags = tags.Select(t => t.StartsWith(TAG_PREFIX) ? t : TAG_PREFIX + t + ">");
+
             SparqlResultSet results = this._endpoint.QueryWithResultSet(PREFIXES + @"
                                                                         SELECT ?an ?tag ?albName ?tagCount ?alb
                                                                         WHERE
@@ -44,8 +76,15 @@ namespace WebAPI.Services
                                                                             }
                                                                             GROUP BY ?albName ?an ?alb
                                                                         }
-                                                                        ORDER BY DESC(?tagCount)");
+                                                                        ORDER BY DESC(?tagCount)" + BuildLimitQuery(page, pageSize));
             return results;
+        }
+
+        private string BuildLimitQuery(int page, int pageSize)
+        {
+            int offset = (page - 1) * pageSize;
+
+            return $"LIMIT {pageSize} OFFSET {offset}";
         }
     }
 }

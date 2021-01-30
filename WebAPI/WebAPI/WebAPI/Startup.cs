@@ -28,8 +28,12 @@ namespace WebAPI
             services.AddControllers();
 
             #region Mocked services
-            services.Add(new ServiceDescriptor(typeof(IAlbumService), new MockAlbumService()));
+            services.AddScoped<IAlbumService, MockAlbumService>();
+            services.AddScoped<IQueryParserService, QuerySplitterService>();
             #endregion
+
+            //services.AddScoped<IAlbumService, AlbumService>();
+            services.AddScoped<IJamendoService, JamendoService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

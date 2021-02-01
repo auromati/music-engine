@@ -34,7 +34,7 @@ namespace WebAPI.Services
         {
             var tags = parserService.ParseQuery(tagsQuery);
 
-            return jamendoService.GetAlbumsByTags(tags, page, PAGE_SIZE);
+            return jamendoService.GetAlbumsByTags(tags.Tags, page, PAGE_SIZE);
         }
     }
 }

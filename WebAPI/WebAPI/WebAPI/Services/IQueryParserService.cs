@@ -1,7 +1,9 @@
-﻿namespace WebAPI.Services
+﻿using WebAPI.Models;
+
+namespace WebAPI.Services
 {
     public interface IQueryParserService
     {
-        string[] ParseQuery(string query);
+        QueryItems ParseQuery(string query);
     }
 }

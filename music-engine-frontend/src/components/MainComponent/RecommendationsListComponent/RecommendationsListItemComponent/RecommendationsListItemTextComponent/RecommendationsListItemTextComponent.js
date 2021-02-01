@@ -10,13 +10,13 @@ const RecommendationsListItemTextComponent = ({label, text, tooltipText}) => (
         {
         tooltipText ? <Tooltip title={tooltipText}><HelpIcon fontSize="small" /></Tooltip> : null
         }: {text}
-
     </div>
 );
 
 RecommendationsListItemTextComponent.propTypes = {
   label: PropTypes.string,
-  text: PropTypes.string
+  text: PropTypes.string,
+  tooltipText: PropTypes.string
 };
 
 RecommendationsListItemTextComponent.defaultProps = {};

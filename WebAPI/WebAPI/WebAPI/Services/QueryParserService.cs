@@ -18,15 +18,6 @@ namespace WebAPI.Services
         private readonly string WORDNET_PATH = "C:/dev/studia/semantyczne/projekt/music-engine/WebAPI/WebAPI/WebAPI/static/word-net-dict";
         private readonly string NER_PATH = "C:/dev/studia/semantyczne/projekt/music-engine/WebAPI/WebAPI/WebAPI/static/name-find/";
 
-        private readonly HashSet<string> JAMENDO_TAGS = new HashSet<string>
-        {
-            "sad", "calm", "energetic", "cheerful", "happy", "epic", "peaceful", "melodic", "weird", "relaxing",
-            "soft", "spiritual", "dramatic", "dark", "nostalgic", "uplifting", "inspiring", "hopeful", "romantic",
-            "oriental", "rock", "metal", "new wave", "jazz", "house", "pop", "dance", "electronic", "ambient",
-            "minimal", "latin", "ebm", "idm", "techno", "r'n'b", "hip hop", "rap", "indie", "alternative",
-            "blues", "country", "disco", "soul"
-        };
-
 
         public QueryItems ParseQuery(string query)
         {
@@ -38,7 +29,7 @@ namespace WebAPI.Services
             {
                 Tags = tags,
                 Locations = locations
-            }; 
+            };
         }
 
         private List<string> GetLocations(string query)
@@ -54,30 +45,34 @@ namespace WebAPI.Services
 
         private List<string> GetTags(IEnumerable<string> lemmas)
         {
-            var tags = new List<string>();
+            var tags = new HashSet<string>();
             WordNet wn = new WordNet(new WordNetFileProvider(WORDNET_PATH));
 
             foreach (var lemma in lemmas)
             {
-                if (JAMENDO_TAGS.Contains(lemma.ToLower()))
-                {
-                    tags.Add(lemma);
-                    continue;
-                }
+                bool lemmaAdded = false;
                 var synsets = wn.GetSynSets(lemma);
                 foreach (var synset in synsets)
                 {
+                    if (synset.Pos != WordNetPos.Adjective && synset.Pos != WordNetPos.Noun)
+                    {
+                        continue;
+                    }
+                    if (!lemmaAdded)
+                    {
+                        tags.Add(lemma);
+                        lemmaAdded = true;
+                    }
                     foreach (var synonym in synset.Words)
                     {
-                        if (JAMENDO_TAGS.Contains(synonym))
+                        if (!tags.Contains(synonym))
                         {
                             tags.Add(synonym);
-                            break;
                         }
                     }
                 }
             }
-            return tags;
+            return tags.ToList();
 
         }
 

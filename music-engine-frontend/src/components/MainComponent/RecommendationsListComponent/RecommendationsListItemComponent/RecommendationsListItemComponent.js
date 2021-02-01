@@ -29,7 +29,7 @@ const RecommendationsListItemComponent = ({ recommendation }) => (
             </RecommendationsListItemTextComponent>
             <RecommendationsListItemTextComponent
               label="Location"
-              text={recommendation.location}
+              text={recommendation.location.name}
             >
             </RecommendationsListItemTextComponent>
             <RecommendationsListItemTextComponent
@@ -39,7 +39,7 @@ const RecommendationsListItemComponent = ({ recommendation }) => (
             </RecommendationsListItemTextComponent>
             <RecommendationsListItemTextComponent
               label="Tags"
-              text={recommendation.tags.join(', ')}
+              text={recommendation.tags.map(tag=> tag.split('/').pop()).join(', ')}
             >
             </RecommendationsListItemTextComponent>
           </div>

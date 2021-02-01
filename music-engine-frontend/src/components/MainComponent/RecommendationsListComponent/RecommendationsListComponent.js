@@ -10,7 +10,7 @@ const RecommendationsListComponent = ({ recommendations }) => {
   return recommendations && recommendations.length ? (
     <List>
       {recommendations.map((recommendation, index) =>
-      (<React.Fragment>
+      (<React.Fragment key={index}>
         <ListItem alignItems="flex-start">
           <RecommendationsListItemComponent recommendation={recommendation}></RecommendationsListItemComponent>
         </ListItem>

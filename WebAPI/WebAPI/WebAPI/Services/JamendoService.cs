@@ -29,9 +29,12 @@ namespace WebAPI.Services
 
         private readonly string STRING_SCHEMA = "http://www.w3.org/2001/XMLSchema#string";
 
-        public JamendoService()
+        private IGeoNamesService _geoNamesService;
+
+        public JamendoService(IGeoNamesService geoNamesService)
         {
             this._endpoint = new SparqlRemoteEndpoint(new Uri(JAMENDO_URL), GRAPH_NAME);
+            this._geoNamesService = geoNamesService;
         }
 
         public IEnumerable<Album> GetAlbumsByTags(IEnumerable<string> tags, int page = 1, int pageSize = 10)
@@ -49,11 +52,12 @@ namespace WebAPI.Services
 
         public Album GetAlbumByUrl(string albumUrl)
         {
-            var query = @"SELECT ?p ?o ?makerName
+            var query = @"SELECT ?p ?o ?makerName ?makerLocation
                         {
                           <" + albumUrl + @"> ?p ?o ;
                                               foaf:maker ?maker .
-                          ?maker foaf:name ?makerName
+                          ?maker foaf:name ?makerName .
+                          ?maker foaf:based_near ?makerLocation  
                         }
                         ";
             var resultSet = _endpoint.QueryWithResultSet(query);
@@ -70,6 +74,11 @@ namespace WebAPI.Services
             var date = GetSingleStringPropertyFromResultSet(resultSet, "date");
             DateTime.TryParse(date, out DateTime dateTimeParsed);
 
+            var locationUrl = GetSingleStringPropertyFromResultSet(resultSet, "maker", "p", "makerLocation");
+            Console.WriteLine(locationUrl);
+            var location = this._geoNamesService.GetLocation(locationUrl);
+            var country = location.CountryName;
+
             return new Album()
             {
                 Title = title,
@@ -77,7 +86,9 @@ namespace WebAPI.Services
                 Tags = tags,
                 ImagePath = imagePath,
                 Url = albumUrl,
-                ReleaseDate = dateTimeParsed
+                ReleaseDate = dateTimeParsed,
+                Location = location,
+                Country = country
             };
         }
 

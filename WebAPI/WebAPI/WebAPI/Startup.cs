@@ -28,11 +28,12 @@ namespace WebAPI
             services.AddControllers();
 
             #region Mocked services
-            services.AddScoped<IAlbumService, MockAlbumService>();
+            //services.AddScoped<IAlbumService, MockAlbumService>();
             services.AddScoped<IQueryParserService, QuerySplitterService>();
             #endregion
 
-            //services.AddScoped<IAlbumService, AlbumService>();
+            services.AddScoped<IAlbumService, AlbumService>();
+            services.AddScoped<IGeoNamesService, GeoNamesService>();
             services.AddScoped<IJamendoService, JamendoService>();
         }
 

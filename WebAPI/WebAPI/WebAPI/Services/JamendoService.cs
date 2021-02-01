@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VDS.RDF;
 using VDS.RDF.Parsing;
+using VDS.RDF.Parsing.Handlers;
 using VDS.RDF.Query;
 using WebAPI.Models;
 
@@ -26,9 +27,14 @@ namespace WebAPI.Services
                                              PREFIX dc: <http://purl.org/dc/elements/1.1/>
                                              PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>";
 
-        public JamendoService()
+        private readonly string STRING_SCHEMA = "http://www.w3.org/2001/XMLSchema#string";
+
+        private IGeoNamesService _geoNamesService;
+
+        public JamendoService(IGeoNamesService geoNamesService)
         {
             this._endpoint = new SparqlRemoteEndpoint(new Uri(JAMENDO_URL), GRAPH_NAME);
+            this._geoNamesService = geoNamesService;
         }
 
         public IEnumerable<Album> GetAlbumsByTags(IEnumerable<string> tags, int page = 1, int pageSize = 10)
@@ -38,22 +44,67 @@ namespace WebAPI.Services
             var resultsSet = this.QueryAlbumsByTags(tags, page, pageSize);
             foreach(var albumResult in resultsSet)
             {
-                results.Add(new Album
-                {
-                    Url = albumResult["alb"].ToString()
-                });
+                results.Add(GetAlbumByUrl(albumResult["alb"].ToString()));
             }
 
             return results;
         }
-        public SparqlResultSet GetAlbumByUrl(string albumUrl)
+
+        public Album GetAlbumByUrl(string albumUrl)
         {
-            var query = $"DESCRIBE <{albumUrl}>";
+            var query = @"SELECT ?p ?o ?makerName ?makerLocation
+                        {
+                          <" + albumUrl + @"> ?p ?o ;
+                                              foaf:maker ?maker .
+                          ?maker foaf:name ?makerName .
+                          ?maker foaf:based_near ?makerLocation  
+                        }
+                        ";
+            var resultSet = _endpoint.QueryWithResultSet(query);
 
-            //Get the result
-            var g = _endpoint.QueryWithResultSet(query);
+            return ParsePropertiesResultSetToAlbum(resultSet, albumUrl);
+        }
 
-            return g;
+        private Album ParsePropertiesResultSetToAlbum(SparqlResultSet resultSet, string albumUrl)
+        {
+            var title = GetSingleStringPropertyFromResultSet(resultSet, "title");
+            var artist = GetSingleStringPropertyFromResultSet(resultSet, "maker", "p", "makerName");
+            var tags = GetMultipleStringPropertiesFromResultSet(resultSet, "taggedWithTag");
+            var imagePath = GetSingleStringPropertyFromResultSet(resultSet, "image");
+            var date = GetSingleStringPropertyFromResultSet(resultSet, "date");
+            DateTime.TryParse(date, out DateTime dateTimeParsed);
+
+            var locationUrl = GetSingleStringPropertyFromResultSet(resultSet, "maker", "p", "makerLocation");
+            Console.WriteLine(locationUrl);
+            var location = this._geoNamesService.GetLocation(locationUrl);
+            var country = location.CountryName;
+
+            return new Album()
+            {
+                Title = title,
+                Artist = artist,
+                Tags = tags,
+                ImagePath = imagePath,
+                Url = albumUrl,
+                ReleaseDate = dateTimeParsed,
+                Location = location,
+                Country = country
+            };
+        }
+
+        private string GetSingleStringPropertyFromResultSet(SparqlResultSet resultSet, string property)
+        {
+            return resultSet.Where(r => r["p"].ToString().Contains(property)).Select(r => r["o"].ToString().Replace($"^^{STRING_SCHEMA}", "")).FirstOrDefault() ?? string.Empty;
+        }
+
+        private string GetSingleStringPropertyFromResultSet(SparqlResultSet resultSet, string property, string pred, string obj)
+        {
+            return resultSet.Where(r => r[pred].ToString().Contains(property)).Select(r => r[obj].ToString().Replace($"^^{STRING_SCHEMA}", "")).FirstOrDefault() ?? string.Empty;
+        }
+
+        private IList<string> GetMultipleStringPropertiesFromResultSet(SparqlResultSet resultSet, string property)
+        {
+            return resultSet.Where(r => r["p"].ToString().Contains(property)).Select(r => r["o"].ToString().Replace($"^^{STRING_SCHEMA}", "")).ToList();
         }
 
         private SparqlResultSet QueryAlbumsByTags(IEnumerable<string> tags, int page=1, int pageSize=10)

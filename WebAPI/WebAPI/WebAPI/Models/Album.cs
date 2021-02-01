@@ -22,5 +22,7 @@ namespace WebAPI.Models
         public string Url { get; set; }
 
         public string ImagePath { get; set; }
+
+        public Location Location { get; set; }
     }
 }

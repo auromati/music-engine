@@ -44,7 +44,9 @@ namespace WebAPI.Services
             var resultsSet = this.QueryAlbumsByTags(tags, page, pageSize);
             foreach(var albumResult in resultsSet)
             {
-                results.Add(GetAlbumByUrl(albumResult["alb"].ToString()));
+                var album = GetAlbumByUrl(albumResult["alb"].ToString());
+                album.Matches = album.Tags.Where(albumTag => tags.Any(tag => albumTag.IndexOf("/" + tag) == (albumTag.Length - tag.Length - 1))).Count();
+                results.Add(album);
             }
 
             return results;
@@ -57,7 +59,7 @@ namespace WebAPI.Services
                           <" + albumUrl + @"> ?p ?o ;
                                               foaf:maker ?maker .
                           ?maker foaf:name ?makerName .
-                          ?maker foaf:based_near ?makerLocation  
+                          OPTIONAL { ?maker foaf:based_near ?makerLocation }  
                         }
                         ";
             var resultSet = _endpoint.QueryWithResultSet(query);
@@ -73,7 +75,6 @@ namespace WebAPI.Services
             var imagePath = GetSingleStringPropertyFromResultSet(resultSet, "image");
             var date = GetSingleStringPropertyFromResultSet(resultSet, "date");
             DateTime.TryParse(date, out DateTime dateTimeParsed);
-
             var locationUrl = GetSingleStringPropertyFromResultSet(resultSet, "maker", "p", "makerLocation");
             Console.WriteLine(locationUrl);
             var location = this._geoNamesService.GetLocation(locationUrl);
@@ -88,7 +89,7 @@ namespace WebAPI.Services
                 Url = albumUrl,
                 ReleaseDate = dateTimeParsed,
                 Location = location,
-                Country = country
+                Country = country,
             };
         }
 
@@ -130,6 +131,7 @@ namespace WebAPI.Services
                                                                         ORDER BY DESC(?tagCount)" + BuildLimitQuery(page, pageSize));
             return results;
         }
+
 
         private string BuildLimitQuery(int page, int pageSize)
         {

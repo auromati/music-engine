@@ -24,5 +24,7 @@ namespace WebAPI.Models
         public string ImagePath { get; set; }
 
         public Location Location { get; set; }
+
+        public int Matches { get; set; }
     }
 }

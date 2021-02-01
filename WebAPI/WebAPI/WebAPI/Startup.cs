@@ -30,9 +30,10 @@ namespace WebAPI
 
             #region Mocked services
             //services.AddScoped<IAlbumService, MockAlbumService>();
-            services.AddScoped<IQueryParserService, QuerySplitterService>();
+            //services.AddScoped<IQueryParserService, QuerySplitterService>();
             #endregion
 
+            services.AddScoped<IQueryParserService, QueryParserService>();
             services.AddScoped<IAlbumService, AlbumService>();
             services.AddScoped<IGeoNamesService, GeoNamesService>();
             services.AddScoped<IJamendoService, JamendoService>();

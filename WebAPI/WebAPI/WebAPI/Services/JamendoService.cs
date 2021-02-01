@@ -95,17 +95,17 @@ namespace WebAPI.Services
 
         private string GetSingleStringPropertyFromResultSet(SparqlResultSet resultSet, string property)
         {
-            return resultSet.Where(r => r["p"].ToString().Contains(property)).Select(r => r["o"].ToString().Replace($"^^{STRING_SCHEMA}", "")).FirstOrDefault() ?? string.Empty;
+            return resultSet.Where(r => r["p"].ToString().Contains(property))?.Select(r => r["o"].ToString().Replace($"^^{STRING_SCHEMA}", "")).FirstOrDefault() ?? string.Empty;
         }
 
         private string GetSingleStringPropertyFromResultSet(SparqlResultSet resultSet, string property, string pred, string obj)
         {
-            return resultSet.Where(r => r[pred].ToString().Contains(property)).Select(r => r[obj].ToString().Replace($"^^{STRING_SCHEMA}", "")).FirstOrDefault() ?? string.Empty;
+            return resultSet.Where(r => r[pred].ToString().Contains(property))?.Select(r => r[obj].ToString().Replace($"^^{STRING_SCHEMA}", "")).FirstOrDefault() ?? string.Empty;
         }
 
         private IList<string> GetMultipleStringPropertiesFromResultSet(SparqlResultSet resultSet, string property)
         {
-            return resultSet.Where(r => r["p"].ToString().Contains(property)).Select(r => r["o"].ToString().Replace($"^^{STRING_SCHEMA}", "")).ToList();
+            return resultSet.Where(r => r["p"].ToString().Contains(property))?.Select(r => r["o"].ToString().Replace($"^^{STRING_SCHEMA}", "")).ToList();
         }
 
         private SparqlResultSet QueryAlbumsByTags(IEnumerable<string> tags, int page=1, int pageSize=10)

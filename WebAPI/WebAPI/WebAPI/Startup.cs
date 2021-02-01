@@ -33,7 +33,7 @@ namespace WebAPI
             //services.AddScoped<IQueryParserService, QuerySplitterService>();
             #endregion
 
-            services.AddScoped<IQueryParserService, QueryParserService>();
+            services.AddSingleton<IQueryParserService, QueryParserService>();
             services.AddScoped<IAlbumService, AlbumService>();
             services.AddScoped<IGeoNamesService, GeoNamesService>();
             services.AddScoped<IJamendoService, JamendoService>();

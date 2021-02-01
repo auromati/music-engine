@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Models;
@@ -14,10 +15,18 @@ namespace WebAPI.Controllers
     public class AlbumsController : ControllerBase
     {
         private IAlbumService _albumService;
+        private IHostingEnvironment HostingEnvironment;
 
-        public AlbumsController(IAlbumService albumService)
+        public AlbumsController(IAlbumService albumService, IHostingEnvironment hostingEnvironment)
         {
             this._albumService = albumService;
+            this.HostingEnvironment = hostingEnvironment;
+        }
+
+        [HttpGet]
+        public string Get()
+        {
+            return HostingEnvironment.ContentRootPath;
         }
 
         // GET: api/Albums/5

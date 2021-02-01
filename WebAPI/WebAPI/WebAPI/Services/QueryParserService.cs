@@ -1,4 +1,5 @@
 ﻿using LemmaSharp.Classes;
+using Microsoft.AspNetCore.Hosting;
 using OpenNLP.Tools.NameFind;
 using OpenNLP.Tools.Tokenize;
 using SharpNL.WordNet;
@@ -13,10 +14,10 @@ using WebAPI.Models;
 namespace WebAPI.Services
 {
     public class QueryParserService : IQueryParserService
-    {       //TODO: fix absolute path
-        private readonly string LEMMATIZER_DICT_PATH = "C:/dev/studia/semantyczne/projekt/music-engine/WebAPI/WebAPI/WebAPI/static/full7z-multext-en.lem";
-        private readonly string WORDNET_PATH = "C:/dev/studia/semantyczne/projekt/music-engine/WebAPI/WebAPI/WebAPI/static/word-net-dict";
-        private readonly string NER_PATH = "C:/dev/studia/semantyczne/projekt/music-engine/WebAPI/WebAPI/WebAPI/static/name-find/";
+    {       
+        private readonly string LEMMATIZER_DICT_PATH;
+        private readonly string WORDNET_PATH;
+        private readonly string NER_PATH;
 
         private readonly HashSet<string> JAMENDO_TAGS = new HashSet<string>
         {
@@ -27,6 +28,12 @@ namespace WebAPI.Services
             "blues", "country", "disco", "soul"
         };
 
+        public QueryParserService(IHostingEnvironment hostingEnvironment)
+        {
+            LEMMATIZER_DICT_PATH = hostingEnvironment.ContentRootPath + "\\..\\WebAPI\\static\\full7z-multext-en.lem";
+            WORDNET_PATH = hostingEnvironment.ContentRootPath + "\\..\\WebAPI\\static\\word-net-dict\\";
+            NER_PATH = hostingEnvironment.ContentRootPath + "\\..\\WebAPI\\static\\name-find\\";
+        }
 
         public QueryItems ParseQuery(string query)
         {

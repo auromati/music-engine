@@ -19,4 +19,4 @@ const recommendations = [
     }
 ];
 
-export const getRecommendations = (description) => new Promise((resolve, reject) => resolve(recommendations));
+export const getRecommendations = (description, page) => new Promise((resolve, reject) => resolve(recommendations));

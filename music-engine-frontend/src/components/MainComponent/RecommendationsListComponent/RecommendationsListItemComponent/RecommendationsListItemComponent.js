@@ -5,42 +5,50 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import RecommendationsListItemTextComponent from './RecommendationsListItemTextComponent/RecommendationsListItemTextComponent';
 import { Link, Typography } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 
-const RecommendationsListItemComponent = ({recommendation}) => (
+const RecommendationsListItemComponent = ({ recommendation }) => (
   <React.Fragment>
     <ListItemAvatar>
-      <Avatar 
-        src={recommendation.imagePath} 
-        style={{height: '120px', width: '120px', marginRight: '0.8em'}} />
+      <Avatar
+        src={recommendation.imagePath}
+        style={{ height: '120px', width: '120px', marginRight: '0.8em' }} />
     </ListItemAvatar>
     <ListItemText
       primary={
-      <Link href={recommendation.url}>
-        <Typography variant="h6">{recommendation.title}</Typography>
-      </Link>}
+        <Link href={recommendation.url}>
+          <Typography variant="h6">{recommendation.title}</Typography>
+        </Link>}
       secondary={
-        <React.Fragment>
+        <Box display="flex" justifyContent="space-between" flexDirection="row">
+          <div>
+            <RecommendationsListItemTextComponent
+              label="Artist"
+              text={recommendation.artist}
+            >
+            </RecommendationsListItemTextComponent>
+            <RecommendationsListItemTextComponent
+              label="Location"
+              text={recommendation.location}
+            >
+            </RecommendationsListItemTextComponent>
+            <RecommendationsListItemTextComponent
+              label="Release date"
+              text={recommendation.releaseDate}
+            >
+            </RecommendationsListItemTextComponent>
+            <RecommendationsListItemTextComponent
+              label="Tags"
+              text={recommendation.tags.join(', ')}
+            >
+            </RecommendationsListItemTextComponent>
+          </div>
           <RecommendationsListItemTextComponent
-            label="Artist"
-            text={recommendation.artist}
-          >
-          </RecommendationsListItemTextComponent>
-          <RecommendationsListItemTextComponent
-            label="Location"
-            text={recommendation.location}
-          >
-          </RecommendationsListItemTextComponent>
-          <RecommendationsListItemTextComponent
-            label="Release date"
-            text={recommendation.releaseDate}
-          >
-          </RecommendationsListItemTextComponent>
-          <RecommendationsListItemTextComponent
-            label="Tags"
-            text={recommendation.tags.join(', ')}
-          >
-          </RecommendationsListItemTextComponent>
-        </React.Fragment>
+            label="Matches"
+            text={recommendation.matches}
+            tooltipText="Ordering score based on matched tags"
+          ></RecommendationsListItemTextComponent>
+        </Box>
       }
     />
   </React.Fragment>

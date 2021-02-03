@@ -18,12 +18,18 @@ namespace WebAPI.Services
 
         public Location GetLocation(string url)
         {
-            var data = GetLocationName(url).FirstOrDefault();
             var name = "";
             var countryName = "";
+            var defaultLocation = new Location { CountryName = countryName, Name = name };
+            if (String.IsNullOrEmpty(url))
+            {
+                return defaultLocation;
+            }
+            var data = GetLocationName(url).FirstOrDefault();
+
 
             if (data == null)
-                return new Location { CountryName = countryName, Name = name };
+                return defaultLocation;
 
             name = data["name"].ToString();
             Console.WriteLine(name);

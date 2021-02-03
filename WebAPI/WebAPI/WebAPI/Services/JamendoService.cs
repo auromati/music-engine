@@ -100,7 +100,7 @@ namespace WebAPI.Services
 
         private string GetSingleStringPropertyFromResultSet(SparqlResultSet resultSet, string property, string pred, string obj)
         {
-            return resultSet.Where(r => r[pred].ToString().Contains(property))?.Select(r => r[obj].ToString().Replace($"^^{STRING_SCHEMA}", "")).FirstOrDefault() ?? string.Empty;
+            return resultSet.Where(r => r[pred].ToString().Contains(property))?.Select(r => r[obj]?.ToString().Replace($"^^{STRING_SCHEMA}", "")).FirstOrDefault() ?? string.Empty;
         }
 
         private IList<string> GetMultipleStringPropertiesFromResultSet(SparqlResultSet resultSet, string property)
